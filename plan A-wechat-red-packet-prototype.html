@@ -1,0 +1,1143 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>发红包金额提示示意</title>
+    <style>
+      :root {
+        --page: #ededed;
+        --card: #ffffff;
+        --text: #111318;
+        --muted: #969ba3;
+        --hairline: #e7e7e7;
+        --accent: #ff4d4f;
+        --chip-bg: #fff4d8;
+        --chip-text: #e7a300;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: #d9d9d9;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      .stage {
+        width: min(760px, 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 22px;
+      }
+
+      .phone {
+        width: min(390px, 100vw);
+        height: min(844px, 100vh);
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px;
+        background: var(--page);
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+      }
+
+      .demo-panel {
+        width: 236px;
+        padding: 14px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
+      }
+
+      .demo-title {
+        margin: 0 0 12px;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .demo-field {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .demo-field span {
+        color: #666b73;
+        font-size: 12px;
+      }
+
+      .demo-input {
+        height: 38px;
+        width: 100%;
+        border: 1px solid #dadde3;
+        border-radius: 8px;
+        padding: 0 10px;
+        outline: 0;
+        color: #111318;
+        background: #fff;
+      }
+
+      .demo-input:focus {
+        border-color: var(--accent);
+      }
+
+      .preset-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .preset {
+        height: 34px;
+        border: 1px solid #e3e5e9;
+        border-radius: 8px;
+        background: #fff;
+        color: #30343b;
+        cursor: pointer;
+      }
+
+      .preset.active {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: #fff4f4;
+      }
+
+      .demo-type {
+        margin: 12px 0 0;
+        color: #7d828a;
+        font-size: 12px;
+      }
+
+      @media (max-width: 760px) {
+        body {
+          align-items: start;
+        }
+
+        .stage {
+          flex-direction: column;
+        }
+
+        .demo-panel {
+          width: min(390px, 100%);
+        }
+      }
+
+      @media (max-width: 430px) {
+        body {
+          background: var(--page);
+          padding: 0;
+        }
+
+        .stage {
+          gap: 0;
+        }
+
+        .phone {
+          width: 100vw;
+          height: 100vh;
+          border-radius: 0;
+          box-shadow: none;
+        }
+
+        .demo-panel {
+          display: none;
+        }
+      }
+
+      .statusbar {
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 28px 0 37px;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0;
+        background: var(--page);
+      }
+
+      .signal {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+      }
+
+      .bars {
+        display: flex;
+        gap: 2px;
+        align-items: end;
+        height: 13px;
+      }
+
+      .bars span {
+        width: 3px;
+        border-radius: 2px;
+        background: #111;
+      }
+
+      .bars span:nth-child(1) {
+        height: 5px;
+      }
+
+      .bars span:nth-child(2) {
+        height: 7px;
+      }
+
+      .bars span:nth-child(3) {
+        height: 10px;
+      }
+
+      .bars span:nth-child(4) {
+        height: 12px;
+      }
+
+      .wifi {
+        width: 16px;
+        height: 12px;
+        position: relative;
+      }
+
+      .wifi::before,
+      .wifi::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 2px solid #111;
+        border-color: #111 transparent transparent transparent;
+        border-radius: 50%;
+      }
+
+      .wifi::before {
+        top: 1px;
+        width: 15px;
+        height: 15px;
+      }
+
+      .wifi::after {
+        top: 5px;
+        width: 8px;
+        height: 8px;
+      }
+
+      .battery {
+        width: 24px;
+        height: 12px;
+        border: 1.7px solid #111;
+        border-radius: 4px;
+        position: relative;
+      }
+
+      .battery::before {
+        content: "";
+        position: absolute;
+        right: -4px;
+        top: 3px;
+        width: 2px;
+        height: 5px;
+        background: #111;
+        border-radius: 1px;
+      }
+
+      .battery::after {
+        content: "";
+        position: absolute;
+        inset: 2px;
+        width: 14px;
+        border-radius: 2px;
+        background: #111;
+      }
+
+      .nav {
+        height: 48px;
+        display: grid;
+        grid-template-columns: 48px 1fr 48px;
+        align-items: center;
+        padding: 0 4px;
+        background: var(--page);
+      }
+
+      .nav-title {
+        text-align: center;
+        font-size: 17px;
+        font-weight: 600;
+      }
+
+      .icon-button {
+        height: 44px;
+        border: 0;
+        background: transparent;
+        display: grid;
+        place-items: center;
+        color: #1f2329;
+        cursor: pointer;
+      }
+
+      .back {
+        width: 13px;
+        height: 13px;
+        border-left: 2px solid currentColor;
+        border-bottom: 2px solid currentColor;
+        transform: rotate(45deg);
+      }
+
+      .more {
+        font-size: 22px;
+        line-height: 1;
+        transform: translateY(-3px);
+      }
+
+      main {
+        padding: 0 15px;
+      }
+
+      .message-card,
+      .cover-card {
+        background: var(--card);
+        border-radius: 6px;
+      }
+
+      .message-card {
+        min-height: 72px;
+        padding: 20px 16px 16px;
+        overflow: hidden;
+        transition: min-height 180ms ease;
+      }
+
+      .message-card.has-tips {
+        min-height: 138px;
+      }
+
+      .greeting-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .greeting-input {
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #333;
+        font-size: 17px;
+      }
+
+      .greeting-input::placeholder {
+        color: #a9acb3;
+      }
+
+      .emoji {
+        color: #a3a6ad;
+        font-size: 20px;
+        white-space: nowrap;
+      }
+
+      .tips {
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px solid var(--hairline);
+        opacity: 0;
+        transform: translateY(-4px);
+        max-height: 0;
+        overflow: hidden;
+        transition: opacity 180ms ease, transform 180ms ease, max-height 180ms ease;
+      }
+
+      .message-card.has-tips .tips {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 70px;
+        overflow: hidden;
+      }
+
+      .tips-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 11px;
+        color: #9da0a7;
+      }
+
+      .tips-title {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: #111318;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .info-button {
+        width: 14px;
+        height: 14px;
+        padding: 0;
+        border: 1px solid #6f747c;
+        border-radius: 50%;
+        display: inline-grid;
+        place-items: center;
+        background: transparent;
+        color: #555b63;
+        font-size: 10px;
+        line-height: 1;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .heart {
+        color: var(--accent);
+        font-size: 11px;
+      }
+
+      .swap {
+        border: 0;
+        background: transparent;
+        color: #7f848b;
+        font-size: 11px;
+        cursor: pointer;
+      }
+
+      .chips {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 34px;
+        padding: 6px 0 4px;
+        overflow: hidden;
+      }
+
+      .chip {
+        position: relative;
+        height: 24px;
+        padding: 0 9px;
+        border: 1px solid transparent;
+        border-radius: 12px;
+        display: inline-grid;
+        place-items: center;
+        background: var(--chip-bg);
+        color: var(--chip-text);
+        font-size: 11px;
+        line-height: 1;
+        cursor: pointer;
+        flex: 0 0 auto;
+        white-space: nowrap;
+      }
+
+      .chip.slot {
+        overflow: hidden;
+      }
+
+      .chip-reel {
+        display: grid;
+        animation: slotRoll 640ms cubic-bezier(0.18, 0.86, 0.28, 1) both;
+        animation-delay: var(--slot-delay, 0ms);
+      }
+
+      .chip-reel span {
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      @keyframes slotRoll {
+        0% {
+          transform: translateY(0);
+          filter: blur(0);
+        }
+
+        32% {
+          transform: translateY(-22px);
+          filter: blur(0.4px);
+        }
+
+        66% {
+          transform: translateY(-44px);
+          filter: blur(0.2px);
+        }
+
+        100% {
+          transform: translateY(-66px);
+          filter: blur(0);
+        }
+      }
+
+      .chip.selected {
+        border-color: var(--accent);
+        background: #fff;
+        color: var(--accent);
+      }
+
+      .chip-close {
+        position: absolute;
+        top: -5px;
+        right: -4px;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        display: none;
+        place-items: center;
+        background: #aeb2b8;
+        color: #fff;
+        font-size: 11px;
+        line-height: 13px;
+        font-weight: 700;
+      }
+
+      .chip.selected .chip-close {
+        display: grid;
+      }
+
+      .cover-card {
+        height: 62px;
+        margin-top: 16px;
+        padding: 0 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 17px;
+      }
+
+      .chevron {
+        width: 8px;
+        height: 8px;
+        border-right: 1.5px solid #c1c5cc;
+        border-top: 1.5px solid #c1c5cc;
+        transform: rotate(45deg);
+      }
+
+      .amount-section {
+        margin-top: 50px;
+        display: grid;
+        justify-items: center;
+      }
+
+      .amount-wrap {
+        width: 320px;
+        height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at center, rgba(255, 255, 255, 0.72), rgba(237, 237, 237, 0));
+      }
+
+      .currency {
+        margin-right: 10px;
+        font-size: 32px;
+        font-weight: 700;
+        transform: translateY(-2px);
+      }
+
+      .amount-input {
+        width: 126px;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #0f1115;
+        font-size: 46px;
+        font-weight: 650;
+        letter-spacing: 0;
+        text-align: left;
+      }
+
+      .send-button {
+        width: 180px;
+        height: 47px;
+        margin-top: 18px;
+        border: 0;
+        border-radius: 7px;
+        background: var(--accent);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        box-shadow: 0 10px 24px rgba(255, 77, 79, 0.18);
+        cursor: pointer;
+      }
+
+      .keyboard {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 288px;
+        background: #e7e9f0;
+        border-top: 1px solid #e3e5ec;
+        padding-top: 28px;
+      }
+
+      .keyboard-toolbar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 14px;
+        color: #49505a;
+      }
+
+      .toolbar-left {
+        font-size: 22px;
+      }
+
+      .toolbar-right {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        font-size: 30px;
+        line-height: 1;
+      }
+
+      .keys {
+        padding: 3px 3px 0;
+      }
+
+      .key-row {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+
+      .key-row.row-2 {
+        padding: 0 23px;
+        grid-template-columns: repeat(9, 1fr);
+      }
+
+      .key-row.row-3 {
+        grid-template-columns: 52px repeat(7, 1fr) 52px;
+      }
+
+      .key-row.row-4 {
+        grid-template-columns: 54px 36px 30px 1fr 42px 79px;
+        gap: 7px;
+      }
+
+      .key {
+        height: 48px;
+        border: 0;
+        border-radius: 6px;
+        background: #fff;
+        color: #111318;
+        font-size: 21px;
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+      }
+
+      .key.muted {
+        background: #c5cbd4;
+        font-size: 17px;
+      }
+
+      .key.small {
+        font-size: 15px;
+      }
+
+      .key.space {
+        color: #a2a7ae;
+      }
+
+      .home-indicator {
+        position: absolute;
+        left: 130px;
+        right: 130px;
+        bottom: 6px;
+        height: 4px;
+        border-radius: 4px;
+        background: #111;
+      }
+
+      .recommend-modal {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        display: none;
+      }
+
+      .recommend-modal.open {
+        display: block;
+      }
+
+      .modal-backdrop {
+        position: absolute;
+        inset: 0;
+        border: 0;
+        background: rgba(0, 0, 0, 0.36);
+        cursor: pointer;
+      }
+
+      .recommend-sheet {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        min-height: 310px;
+        padding: 20px 20px 30px;
+        border-radius: 10px 10px 0 0;
+        background: #fff;
+      }
+
+      .sheet-title {
+        margin: 0;
+        text-align: center;
+        color: #111318;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .sheet-close {
+        position: absolute;
+        top: 16px;
+        right: 18px;
+        width: 26px;
+        height: 26px;
+        border: 0;
+        background: transparent;
+        color: #9aa0a8;
+        font-size: 26px;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .sheet-desc {
+        width: 260px;
+        margin: 18px auto 16px;
+        text-align: center;
+        color: #8d9299;
+        font-size: 11px;
+        line-height: 1.45;
+      }
+
+      .explain-block {
+        margin-top: 14px;
+      }
+
+      .explain-heading {
+        margin: 0 0 10px;
+        color: #111318;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .scene-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+
+      .scene-card {
+        min-height: 74px;
+        padding: 9px 8px;
+        border-radius: 4px;
+      }
+
+      .scene-card.love-card {
+        background: #fff0f3;
+      }
+
+      .scene-card.fortune-card {
+        background: #fff7db;
+      }
+
+      .scene-card.regular-card {
+        background: #eaf7ff;
+      }
+
+      .scene-card-title {
+        margin: 0 0 7px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .love-card .scene-card-title {
+        color: #ff4d4f;
+      }
+
+      .fortune-card .scene-card-title {
+        color: #e0a000;
+      }
+
+      .regular-card .scene-card-title {
+        color: #2a9ce8;
+      }
+
+      .scene-card p {
+        margin: 0;
+        color: #555b63;
+        font-size: 9px;
+        line-height: 1.55;
+      }
+
+      .effect-copy {
+        margin: 0;
+        color: #30343b;
+        font-size: 11px;
+        line-height: 1.6;
+      }
+
+      .emoji-rain {
+        display: inline-flex;
+        align-items: center;
+        gap: 1px;
+        margin: 0 1px;
+        vertical-align: -1px;
+      }
+
+      .emoji-rain span {
+        font-size: 12px;
+        line-height: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <section class="phone" aria-label="发红包金额提示示意">
+        <header>
+          <div class="statusbar">
+            <span>9:41</span>
+            <div class="signal" aria-hidden="true">
+              <div class="bars"><span></span><span></span><span></span><span></span></div>
+              <div class="wifi"></div>
+              <div class="battery"></div>
+            </div>
+          </div>
+          <nav class="nav">
+            <button class="icon-button" aria-label="返回"><span class="back"></span></button>
+            <div class="nav-title">发红包</div>
+            <button class="icon-button" aria-label="更多"><span class="more">...</span></button>
+          </nav>
+        </header>
+
+        <main>
+          <section class="message-card has-tips" id="messageCard">
+            <div class="greeting-line">
+              <input class="greeting-input" id="greetingInput" value="一直在你身边" aria-label="红包祝福语" />
+              <span class="emoji" aria-hidden="true">☺+</span>
+            </div>
+
+            <div class="tips" id="tipsPanel" aria-live="polite">
+              <div class="tips-head">
+                <div class="tips-title">
+                  <span class="heart">❤</span>
+                  <span>心意推荐</span>
+                  <span>根据金额推荐</span>
+                  <button class="info-button" id="infoButton" type="button" aria-label="查看心意推荐说明">i</button>
+                </div>
+                <button class="swap" id="swapButton" type="button">换一换 ↻</button>
+              </div>
+              <div class="chips" id="chips"></div>
+            </div>
+          </section>
+
+          <section class="cover-card">
+            <span>红包封面</span>
+            <span class="chevron" aria-hidden="true"></span>
+          </section>
+
+          <section class="amount-section">
+            <label class="amount-wrap">
+              <span class="currency">¥</span>
+              <input class="amount-input" id="amountInput" inputmode="decimal" value="13.14" aria-label="红包金额" />
+            </label>
+            <button class="send-button" type="button">塞钱进红包</button>
+          </section>
+        </main>
+
+        <section class="keyboard" aria-hidden="true">
+          <div class="keyboard-toolbar">
+            <span class="toolbar-left">▣</span>
+            <span class="toolbar-right"><span>⌄</span><span>×</span></span>
+          </div>
+          <div class="keys">
+            <div class="key-row">
+              <button class="key">Q</button><button class="key">W</button><button class="key">E</button><button class="key">R</button><button class="key">T</button><button class="key">Y</button><button class="key">U</button><button class="key">I</button><button class="key">O</button><button class="key">P</button>
+            </div>
+            <div class="key-row row-2">
+              <button class="key">A</button><button class="key">S</button><button class="key">D</button><button class="key">F</button><button class="key">G</button><button class="key">H</button><button class="key">J</button><button class="key">K</button><button class="key">L</button>
+            </div>
+            <div class="key-row row-3">
+              <button class="key muted">⇧</button><button class="key">Z</button><button class="key">X</button><button class="key">C</button><button class="key">V</button><button class="key">B</button><button class="key">N</button><button class="key">M</button><button class="key muted">⌫</button>
+            </div>
+            <div class="key-row row-4">
+              <button class="key muted small">123</button><button class="key muted">☺</button><button class="key small">，</button><button class="key space">◌</button><button class="key small">中<br />英</button><button class="key muted small">换行</button>
+            </div>
+          </div>
+          <div class="home-indicator"></div>
+        </section>
+
+        <section class="recommend-modal" id="recommendModal" aria-hidden="true">
+          <button class="modal-backdrop" id="modalBackdrop" type="button" aria-label="关闭说明"></button>
+          <div class="recommend-sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+            <button class="sheet-close" id="sheetClose" type="button" aria-label="关闭">×</button>
+            <h2 class="sheet-title" id="sheetTitle">心意推荐说明</h2>
+            <p class="sheet-desc">我们会根据输入的金额推荐合适的祝福语<br />朋友打开红包时，会看到对应的 emoji 掉落</p>
+
+            <section class="explain-block">
+              <h3 class="explain-heading">1. 金额场景与推荐示意</h3>
+              <div class="scene-cards">
+                <article class="scene-card love-card">
+                  <h4 class="scene-card-title">爱意表达</h4>
+                  <p>金额含 520/1314/999<br />推荐告白类<br />承诺、浪漫场景</p>
+                </article>
+                <article class="scene-card fortune-card">
+                  <h4 class="scene-card-title">财运祝福</h4>
+                  <p>金额含 168/888/666<br />推荐发财类<br />好运、发财场景</p>
+                </article>
+                <article class="scene-card regular-card">
+                  <h4 class="scene-card-title">普通祝福</h4>
+                  <p>金额不含特殊寓意<br />推荐通用类<br />日常心意场景</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="explain-block">
+              <h3 class="explain-heading">2. 朋友打开红包效果</h3>
+              <p class="effect-copy">
+                当朋友打开红包时会根据祝福语内容看到 emoji 雨效果：
+                <span class="emoji-rain" aria-hidden="true"><span>✨</span><span>❤️</span><span>🧧</span><span>💰</span></span>……
+              </p>
+            </section>
+          </div>
+        </section>
+      </section>
+
+      <aside class="demo-panel" aria-label="红包金额调节">
+        <p class="demo-title">红包数据</p>
+        <label class="demo-field">
+          <span>金额</span>
+          <input class="demo-input" id="demoAmountInput" inputmode="decimal" value="13.14" />
+        </label>
+        <div class="preset-grid" id="presetGrid">
+          <button class="preset" type="button" data-amount="12.34">12.34</button>
+          <button class="preset" type="button" data-amount="0.00">0.00</button>
+          <button class="preset active" type="button" data-amount="13.14">13.14</button>
+          <button class="preset" type="button" data-amount="520.00">520</button>
+          <button class="preset" type="button" data-amount="999.00">999</button>
+          <button class="preset" type="button" data-amount="16.80">16.80</button>
+          <button class="preset" type="button" data-amount="168.88">168.88</button>
+          <button class="preset" type="button" data-amount="888.88">888.88</button>
+        </div>
+        <p class="demo-type" id="demoType">情感金额</p>
+      </aside>
+    </div>
+
+    <script>
+      const amountInput = document.querySelector("#amountInput");
+      const messageCard = document.querySelector("#messageCard");
+      const greetingInput = document.querySelector("#greetingInput");
+      const chips = document.querySelector("#chips");
+      const swapButton = document.querySelector("#swapButton");
+      const demoAmountInput = document.querySelector("#demoAmountInput");
+      const presetButtons = [...document.querySelectorAll(".preset")];
+      const demoType = document.querySelector("#demoType");
+      const infoButton = document.querySelector("#infoButton");
+      const recommendModal = document.querySelector("#recommendModal");
+      const modalBackdrop = document.querySelector("#modalBackdrop");
+      const sheetClose = document.querySelector("#sheetClose");
+
+      const tipGroups = {
+        regular: [
+          ["随便花", "请收下", "今天也开心", "小小心意"],
+          ["一点心意", "拿去花", "快乐加倍", "别客气"],
+        ],
+        love: [
+          ["一直在你身边", "想你了", "爱你不止今天", "一生一世"],
+          ["只偏爱你", "见字如面", "日日想你", "满心满眼"],
+        ],
+        fortune: [
+          ["一切顺顺利利", "发发发", "财运常在", "一路发财"],
+          ["顺风顺水", "好运常伴", "财气满满", "一路长红"],
+        ],
+      };
+      const categoryNames = {
+        regular: "普通金额",
+        love: "情感金额",
+        fortune: "发财金额",
+      };
+      let tipIndex = 0;
+      let activeAmountKey = "love";
+      let selectedTip = "一直在你身边";
+      const defaultGreeting = "恭喜发财，大吉大利";
+      const slotFillers = ["心意满满", "好运转转", "祝福加载", "惊喜来了"];
+
+      function normalizeAmount(value) {
+        return Number.parseFloat(String(value).replace(/[^\d.]/g, ""));
+      }
+
+      function getAmountKey(value) {
+        const digits = String(value).replace(/\D/g, "");
+        if (digits.includes("168") || digits.includes("888")) return "fortune";
+        if (digits.includes("520") || digits.includes("1314") || digits.includes("999")) return "love";
+        return "regular";
+      }
+
+      function fitAmountDisplay() {
+        const length = amountInput.value.length;
+        const width = Math.min(240, Math.max(126, length * 26));
+        amountInput.style.width = `${width}px`;
+        amountInput.style.fontSize = length >= 8 ? "34px" : length >= 6 ? "40px" : "46px";
+      }
+
+      function syncDemoControls() {
+        demoAmountInput.value = amountInput.value;
+        demoType.textContent = categoryNames[activeAmountKey];
+        presetButtons.forEach((button) => {
+          const presetAmount = normalizeAmount(button.dataset.amount);
+          const currentAmount = normalizeAmount(amountInput.value);
+          const isActive = !Number.isNaN(currentAmount) && Math.abs(presetAmount - currentAmount) < 0.001;
+          button.classList.toggle("active", isActive);
+        });
+      }
+
+      function setAmount(value, options = {}) {
+        amountInput.value = value;
+        if (options.format) {
+          const amount = normalizeAmount(value);
+          if (!Number.isNaN(amount)) amountInput.value = amount.toFixed(2);
+        }
+        if (options.resetGreeting) {
+          selectedTip = "";
+          greetingInput.value = defaultGreeting;
+        }
+        const didChangeType = syncState();
+        if (options.resetGreeting && !didChangeType) renderTips();
+      }
+
+      function getCurrentTips() {
+        const currentGroups = tipGroups[activeAmountKey] || [];
+        return currentGroups[tipIndex % Math.max(currentGroups.length, 1)] || [];
+      }
+
+      function createChip(text, options = {}) {
+        const button = document.createElement("button");
+        button.className = `chip${selectedTip === text ? " selected" : ""}${options.animate ? " slot" : ""}`;
+        button.type = "button";
+        button.style.setProperty("--slot-delay", `${(options.index || 0) * 72}ms`);
+
+        if (options.animate) {
+          const reel = document.createElement("span");
+          reel.className = "chip-reel";
+          [options.previousText || text, slotFillers[(options.index || 0) % slotFillers.length], slotFillers[((options.index || 0) + 1) % slotFillers.length], text].forEach((item) => {
+            const frame = document.createElement("span");
+            frame.textContent = item;
+            reel.appendChild(frame);
+          });
+          button.appendChild(reel);
+        } else {
+          button.append(document.createTextNode(text));
+        }
+
+        button.addEventListener("click", () => {
+          selectedTip = text;
+          greetingInput.value = text;
+          renderTips();
+        });
+
+        const close = document.createElement("span");
+        close.className = "chip-close";
+        close.textContent = "×";
+        close.setAttribute("aria-label", "取消选中");
+        close.addEventListener("click", (event) => {
+          event.stopPropagation();
+          selectedTip = "";
+          if (greetingInput.value === text) greetingInput.value = defaultGreeting;
+          renderTips();
+        });
+        button.appendChild(close);
+        return button;
+      }
+
+      function renderTips(options = {}) {
+        chips.innerHTML = "";
+        const currentTips = getCurrentTips();
+        currentTips.forEach((text, index) => {
+          const button = createChip(text, {
+            animate: options.animate,
+            index,
+            previousText: options.previousTips?.[index],
+          });
+          chips.appendChild(button);
+        });
+      }
+
+      function syncState() {
+        const nextAmountKey = getAmountKey(amountInput.value);
+        const didChangeType = nextAmountKey !== activeAmountKey;
+        if (didChangeType) {
+          const previousTips = getCurrentTips();
+          activeAmountKey = nextAmountKey;
+          tipIndex = 0;
+          selectedTip = "";
+          greetingInput.value = defaultGreeting;
+          renderTips({ animate: true, previousTips });
+        }
+        messageCard.classList.add("has-tips");
+        fitAmountDisplay();
+        syncDemoControls();
+        return didChangeType;
+      }
+
+      amountInput.addEventListener("input", syncState);
+      amountInput.addEventListener("blur", () => {
+        const value = normalizeAmount(amountInput.value);
+        if (!Number.isNaN(value)) amountInput.value = value.toFixed(2);
+        syncState();
+      });
+
+      swapButton.addEventListener("click", () => {
+        const currentGroups = tipGroups[activeAmountKey] || [];
+        const previousTips = getCurrentTips();
+        tipIndex = currentGroups.length ? (tipIndex + 1) % currentGroups.length : 0;
+        selectedTip = "";
+        greetingInput.value = defaultGreeting;
+        renderTips({ animate: true, previousTips });
+      });
+
+      demoAmountInput.addEventListener("input", () => {
+        setAmount(demoAmountInput.value, { resetGreeting: true });
+      });
+
+      demoAmountInput.addEventListener("blur", () => {
+        setAmount(demoAmountInput.value, { format: true, resetGreeting: true });
+      });
+
+      presetButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          setAmount(button.dataset.amount, { format: true, resetGreeting: true });
+        });
+      });
+
+      function openRecommendModal() {
+        recommendModal.classList.add("open");
+        recommendModal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeRecommendModal() {
+        recommendModal.classList.remove("open");
+        recommendModal.setAttribute("aria-hidden", "true");
+      }
+
+      infoButton.addEventListener("click", openRecommendModal);
+      modalBackdrop.addEventListener("click", closeRecommendModal);
+      sheetClose.addEventListener("click", closeRecommendModal);
+
+      renderTips();
+      syncState();
+    </script>
+  </body>
+</html>
